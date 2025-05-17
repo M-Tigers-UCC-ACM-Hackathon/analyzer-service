@@ -33,8 +33,11 @@ def listen_for_new_logs():
         while conn.notifies:
             notify = conn.notifies.pop(0)
             log_row = notify.payload
-            print(anomaly_log.check_behavior_deviation(log_row, conn))
+            #print(anomaly_log.check_behavior_deviation(log_row, conn))
+
             print(f"New log row inserted: {log_row}")
+
+            anomaly_log.detect_anomalies(log_row, conn)
 
             # detect_anomalies(new_id)  # your logic for preprocessing + 3 checks
 
