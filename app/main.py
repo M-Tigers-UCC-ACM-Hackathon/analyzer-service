@@ -1,8 +1,18 @@
 from fastapi import FastAPI
 from app.db import get_connection
+from app.services.anomaly_listener import listen_for_new_logs
+from threading import Thread
 import psycopg2
 
 app = FastAPI()
+
+
+@app.on_event("startup")
+def start_listener_thread():
+    t = Thread(target=listen_for_new_logs)
+    t.daemon = True
+    t.start()
+    print("Analyzer listener started in background.")
 
 
 @app.get("/")
