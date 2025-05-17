@@ -21,8 +21,12 @@ def detect_anomalies(log_row, conn):
             alert_type="Error Burst",
             severity=2,
             offender_ip=log_row["ip"],
-            reason="20+ 5xx errors in 1 minute",
-            explanation="A spike of server errors indicates instability.",
+            reason=f"Multiple 4xx errors in 1 minute, path: {log_row['path']}",
+            explanation=(
+                "A burst of client/server errors (status >= 400) was detected in the past minute. "
+                "This may indicate application bugs, misconfigured endpoints, or automated scanning. "
+                "Consider reviewing logs for repetitive failing requests, especially from automated clients or crawlers."
+            ),
         )
         return True
     elif check_ip_spike(log_row, conn):
@@ -32,8 +36,12 @@ def detect_anomalies(log_row, conn):
             alert_type="IP Spike",
             severity=2,
             offender_ip=log_row["ip"],
-            reason="100+ requests from same IP in 1 minute",
-            explanation="This IP sent unusually high traffic in a short window.",
+            reason="Multiple requests from same IP in 1 minute",
+            explanation=(
+                f"The IP {log_row['ip']} sent an unusually high number of requests "
+                "within a 1-minute window. This could indicate scraping, brute force activity, "
+                "or an overactive service. Monitor for DDoS-like patterns and rate-limit if needed."
+            ),
         )
         return True
     elif check_behavior_deviation(log_row, conn):
@@ -43,8 +51,12 @@ def detect_anomalies(log_row, conn):
             alert_type="Behavior Deviation",
             severity=1,
             offender_ip=log_row["ip"],
-            reason="Unusual request behavior",
-            explanation="Request method, path or size deviated from expected patterns.",
+            reason=f"Unusual request behavior: method={log_row['method']}, path={log_row['path']}",
+            explanation=(
+                "This request used a non-standard method or suspicious path, which deviates from typical traffic. "
+                "Examples include admin probes, script injections, or unusual API misuse. "
+                "Check for payload anomalies, or access to sensitive routes (e.g. wp-login.php, .env files)."
+            ),
         )
         return True
     else:
@@ -109,7 +121,7 @@ def is_suspicious_path(path):
         ".git",
         ".env",
         "wp-admin",
-        "wp-login"
+        "wp-login",
     ]
     return any(p in path.lower() for p in suspicious_patterns)
 
