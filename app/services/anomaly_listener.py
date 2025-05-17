@@ -2,6 +2,7 @@ import psycopg2
 import select
 import os
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 
@@ -30,8 +31,9 @@ def listen_for_new_logs():
         conn.poll()
         while conn.notifies:
             notify = conn.notifies.pop(0)
-            new_id = int(notify.payload)
-            print(f"New log row inserted: {new_id}")
+            log_row = notify.payload
+            print(f"New log row inserted: {log_row}")
+
             # detect_anomalies(new_id)  # your logic for preprocessing + 3 checks
 
 
