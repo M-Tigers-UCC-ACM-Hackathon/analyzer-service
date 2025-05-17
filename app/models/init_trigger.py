@@ -4,7 +4,7 @@ TRIGGER_SQL = """
 CREATE OR REPLACE FUNCTION notify_new_log()
 RETURNS trigger AS $$
 BEGIN
-  PERFORM pg_notify('new_nginx_log', NEW.id::TEXT);
+  PERFORM pg_notify('new_nginx_log', row_to_json(NEW)::TEXT);
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
