@@ -111,7 +111,6 @@ def is_invalid_method(method):
 
 def is_suspicious_path(path):
     suspicious_patterns = [
-        ".php",
         "?cmd=",
         "/admin",
         "base64",
@@ -122,6 +121,7 @@ def is_suspicious_path(path):
         ".env",
         "wp-admin",
         "wp-login",
+        "cron"
     ]
     return any(p in path.lower() for p in suspicious_patterns)
 
