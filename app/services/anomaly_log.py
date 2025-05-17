@@ -58,9 +58,10 @@ def check_error_burst(row, conn):
             """
             SELECT COUNT(*) FROM nginx_logs
             WHERE log_time >= TIMESTAMP %s - INTERVAL '1 minute'
-              AND status >= 300
+              AND log_time < TIMESTAMP %s
+              AND status >= 400
         """,
-            (row["log_time"],),
+            (row["log_time"], row["log_time"]),
         )
         count = cur.fetchone()[0]
         return count >= 7
@@ -71,9 +72,11 @@ def check_ip_spike(row, conn):
         cur.execute(
             """
             SELECT COUNT(*) FROM nginx_logs
-            WHERE ip = %s AND log_time >= TIMESTAMP %s - INTERVAL '1 minute'
+            WHERE ip = %s
+              AND log_time >= TIMESTAMP %s - INTERVAL '1 minute'
+              AND log_time < TIMESTAMP %s
         """,
-            (row["ip"], row["log_time"]),
+            (row["ip"], row["log_time"], row["log_time"]),
         )
         count = cur.fetchone()[0]
         return count >= 6
@@ -85,8 +88,6 @@ def check_behavior_deviation(row, conn):
     if is_suspicious_path(row["path"]):
         return True
     if is_path_spammy(row, conn):
-        return True
-    if is_bytes_extreme(row, conn):
         return True
     print("No anomalies detected for:", row)
     return False
@@ -118,9 +119,11 @@ def is_path_spammy(row, conn):
         cur.execute(
             """
             SELECT COUNT(*) FROM nginx_logs
-            WHERE ip = %s AND path = %s AND log_time >= TIMESTAMP %s - INTERVAL '1 minute'
+            WHERE ip = %s AND path = %s
+              AND log_time >= TIMESTAMP %s - INTERVAL '1 minute'
+              AND log_time < TIMESTAMP %s
         """,
-            (row["ip"], row["path"], row["log_time"]),
+            (row["ip"], row["path"], row["log_time"], row["log_time"]),
         )
         count = cur.fetchone()[0]
         return count > 50
