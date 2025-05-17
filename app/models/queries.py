@@ -2,32 +2,14 @@ from psycopg2.extras import RealDictCursor
 
 
 def insert_analyzed_log(conn, log_row, flag=0):
-    with conn.cursor() as cur:
-        cur.execute(
-            """
-            INSERT INTO nginx_logs_analyzed (ip, log_time, method, path, http_ver, status, bytes, user_agent, flag)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """,
-            (
-                log_row["ip"],
-                log_row["log_time"],
-                log_row["method"],
-                log_row["path"],
-                log_row["http_ver"],
-                log_row["status"],
-                log_row["bytes"],
-                log_row["user_agent"],
-                flag,
-            ),
-        )
-        conn.commit()
+    pass
 
 
 def update_analyzed_flag(conn, log_id, flag):
     with conn.cursor() as cur:
         cur.execute(
             """
-            UPDATE nginx_logs_analyzed SET flag = %s WHERE id = %s
+            UPDATE nginx_logs SET flag = %s WHERE id = %s
         """,
             (flag, log_id),
         )
