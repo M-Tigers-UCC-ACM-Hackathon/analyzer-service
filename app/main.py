@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.db import get_connection
 from app.services.anomaly_listener import listen_for_new_logs
 from threading import Thread
+from app.models.init_trigger import setup_trigger
 import psycopg2
 
 app = FastAPI()
@@ -9,6 +10,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 def start_listener_thread():
+    setup_trigger()
     t = Thread(target=listen_for_new_logs)
     t.daemon = True
     t.start()
