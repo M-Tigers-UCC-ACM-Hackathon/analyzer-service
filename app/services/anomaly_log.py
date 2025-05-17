@@ -1,5 +1,6 @@
 from datetime import timedelta
 from app.models.queries import insert_analyzed_log, update_analyzed_flag, insert_alert
+import json
 
 
 VALID_METHODS = {"GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT"}
@@ -73,6 +74,7 @@ def check_ip_spike(row, conn):
 
 
 def check_behavior_deviation(row, conn):
+    row = json.loads(row)
     if is_invalid_method(row["method"]):
         return True
     if is_suspicious_path(row["path"]):
@@ -100,6 +102,16 @@ def is_suspicious_path(path):
         "base64",
         "eval(",
         "../",
+        "etc",
+        ".git",
+        ".env",
+        "wp-content",
+        "wp-includes",
+        "wp-admin",
+        "wp-login",
+        "wp-json",
+        "wp-cron",
+        "wp-xmlrpc"
     ]
     return any(p in path.lower() for p in suspicious_patterns)
 
