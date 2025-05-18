@@ -30,13 +30,15 @@ def insert_traffic_metrics(
         conn.commit()
 
 
-def insert_alert(conn, alert_type, severity, offender_ip, reason, explanation):
+def insert_alert(
+    conn, alert_type, severity, offender_ip, reason, explanation, log_time
+):
     with conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO alerts (alert_type, severity, offender_ip, reason, explanation)
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO alerts (alert_type, severity, offender_ip, reason, explanation, log_time)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """,
-            (alert_type, severity, offender_ip, reason, explanation),
+            (alert_type, severity, offender_ip, reason, explanation, log_time),
         )
         conn.commit()
