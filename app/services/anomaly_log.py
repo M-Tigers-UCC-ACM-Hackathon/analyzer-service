@@ -27,6 +27,7 @@ def detect_anomalies(log_row, conn):
                 "This may indicate application bugs, misconfigured endpoints, or automated scanning. "
                 "Consider reviewing logs for repetitive failing requests, especially from automated clients or crawlers."
             ),
+            log_time=log_row["log_time"],
         )
         return True
     elif check_ip_spike(log_row, conn):
@@ -42,6 +43,7 @@ def detect_anomalies(log_row, conn):
                 "within a 1-minute window. This could indicate scraping, brute force activity, "
                 "or an overactive service. Monitor for DDoS-like patterns and rate-limit if needed."
             ),
+            log_time=log_row["log_time"],
         )
         return True
     elif check_behavior_deviation(log_row, conn):
@@ -57,6 +59,7 @@ def detect_anomalies(log_row, conn):
                 "Examples include admin probes, script injections, or unusual API misuse. "
                 "Check for payload anomalies, or access to sensitive routes (e.g. wp-login.php, .env files)."
             ),
+            log_time=log_row["log_time"],
         )
         return True
     else:
